@@ -483,6 +483,7 @@ fn fairness() {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)] // Miri is too slow
 fn fairness_duplicates() {
     #[cfg(miri)]
     const COUNT: usize = 50;
