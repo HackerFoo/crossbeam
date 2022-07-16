@@ -56,7 +56,7 @@ use crate::sync::queue::Queue;
 
 /// Maximum number of objects a bag can contain.
 #[cfg(not(crossbeam_sanitize))]
-const MAX_OBJECTS: usize = 62;
+const MAX_OBJECTS: usize = 64;
 #[cfg(crossbeam_sanitize)]
 const MAX_OBJECTS: usize = 4;
 
@@ -113,6 +113,8 @@ impl Default for Bag {
         return Bag {
             len: 0,
             deferreds: [
+                Deferred::new(no_op_func),
+                Deferred::new(no_op_func),
                 Deferred::new(no_op_func),
                 Deferred::new(no_op_func),
                 Deferred::new(no_op_func),
@@ -371,17 +373,6 @@ pub(crate) struct Local {
     ///
     /// This is just an auxiliary counter that sometimes kicks off collection.
     pin_count: Cell<Wrapping<usize>>,
-}
-
-// Make sure `Local` is less than or equal to 2048 bytes.
-// https://github.com/crossbeam-rs/crossbeam/issues/551
-#[cfg(not(crossbeam_sanitize))] // `crossbeam_sanitize` reduces the size of `Local`
-#[test]
-fn local_size() {
-    assert!(
-        core::mem::size_of::<Local>() <= 2048,
-        "An allocation of `Local` should be <= 2048 bytes."
-    );
 }
 
 impl Local {
